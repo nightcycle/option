@@ -9,8 +9,8 @@ type OptionImpl<V> = {
 	__tostring: (self: Option<V>) -> string,
 	isSome: (self: Option<V>) -> boolean,
 	isNone: (self: Option<V>) -> boolean,
-	onSome: (self: Option<V>, fn: (value: V) -> ()) -> (),
-	onNone: (self: Option<V>, fn: () -> ()) -> (),
+	onSome: (self: Option<V>, fn: (value: V) -> ()) -> Option<V>,
+	onNone: (self: Option<V>, fn: () -> ()) -> Option<V>,
 	match: <O>(self: Option<V>, some: (some: V) -> O, none: () -> O) -> O,
 	unwrap: (self: Option<V>) -> V,
 	expect: (self: Option<V>, msg: string) -> V,
@@ -55,12 +55,14 @@ function Option:onSome(fn: (value: unknown) -> ())
 	if self:isSome() then
 		fn(self._value)
 	end
+	return self
 end
 
 function Option:onNone(fn: () -> ())
 	if self:isNone() then
 		fn()
 	end
+	return self
 end
 
 function Option:match<O>(some: (some: unknown) -> O, none: () -> O): O
