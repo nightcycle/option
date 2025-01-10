@@ -6,6 +6,7 @@
 type State = "S" | "N"
 type OptionImpl<V> = {
 	__index: OptionImpl<V>,
+	__tostring: (self: Option<V>) -> string,
 	isSome: (self: Option<V>) -> boolean,
 	isNone: (self: Option<V>) -> boolean,
 	onSome: (self: Option<V>, fn: (value: V) -> ()) -> (),
@@ -34,6 +35,13 @@ local STATE_NONE: "N" = "N"
 -- Class
 local Option = {} :: OptionImpl<unknown>
 Option.__index = Option
+
+function Option:__tostring()
+	if self:isSome() then
+		return "Some<" .. tostring(self._value) .. ">"
+	end
+	return "None"
+end
 
 function Option:isSome(): boolean
 	return self._state == STATE_SOME
