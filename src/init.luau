@@ -8,6 +8,7 @@ type State = "S" | "N"
 type OptionImpl<V> = {
 	__index: OptionImpl<V>,
 	__tostring: (self: Option<V>) -> string,
+	__eq: (self: Option<V>, other: Option<V>) -> boolean,
 	isSome: (self: Option<V>) -> boolean,
 	isNone: (self: Option<V>) -> boolean,
 	inspect: (self: Option<V>, fn: (value: V) -> ()) -> (),
@@ -63,6 +64,13 @@ function Option:__tostring()
 		return "Some<" .. tostring(self._value) .. ">"
 	end
 	return "None"
+end
+
+function Option:__eq(other: Option<unknown>): boolean
+	if self:isSome() and other:isSome() then
+		return self._value == other._value
+	end
+	return self:isNone() and other:isNone()
 end
 
 function Option:isSome(): boolean
