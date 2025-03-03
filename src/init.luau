@@ -14,12 +14,13 @@ type OptionImpl<V> = {
 	inspect: (self: Option<V>, fn: (value: V) -> ()) -> (),
 	match: <O>(self: Option<V>, some: (some: V) -> O, none: () -> O) -> O,
 	--type swapping with map stuff is technically okay, but I can't get the type engine to recognize that
-	map: (self: Option<V>, fn: (ok: V) -> V) -> Option<V>,
-	mapOr: (self: Option<V>, mapFn: (ok: V) -> V, alt: V) -> Option<V>,
-	mapOrElse: (self: Option<V>, mapFn: (ok: V) -> V, elseFn: () -> V) -> Option<V>,
+	map: (self: Option<V>, fn: (some: V) -> V) -> Option<V>,
+	mapOr: (self: Option<V>, mapFn: (some: V) -> V, alt: V) -> Option<V>,
+	mapOrElse: (self: Option<V>, mapFn: (some: V) -> V, elseFn: () -> V) -> Option<V>,
 	unwrap: (self: Option<V>) -> V,
 	unwrapOr: (self: Option<V>, alt: V) -> V,
 	unwrapOrElse: (self: Option<V>, fn: () -> V) -> V,
+	unpack: (self: Option<V>) -> V?,
 	expect: (self: Option<V>, msg: string) -> V,
 }
 
@@ -97,21 +98,21 @@ function Option:match<O>(some: (some: unknown) -> O, none: () -> O): O
 	end
 end
 
-function Option:map(fn: (ok: unknown) -> unknown): Option<unknown>
+function Option:map(fn: (some: unknown) -> unknown): Option<unknown>
 	if self:isSome() then
 		return asSome(fn(self._value))
 	end
 	return asNone()
 end
 
-function Option:mapOr(mapFn: (ok: unknown) -> unknown, alt: unknown): Option<unknown>
+function Option:mapOr(mapFn: (some: unknown) -> unknown, alt: unknown): Option<unknown>
 	if self:isSome() then
 		return asSome(mapFn(self._value))
 	end
 	return asSome(alt)
 end
 
-function Option:mapOrElse(mapFn: (ok: unknown) -> unknown, elseFn: () -> unknown): Option<unknown>
+function Option:mapOrElse(mapFn: (some: unknown) -> unknown, elseFn: () -> unknown): Option<unknown>
 	if self:isSome() then
 		return asSome(mapFn(self._value))
 	end
@@ -123,6 +124,14 @@ function Option:unwrap()
 		return self._value
 	end
 	error("Option is none")
+end
+
+-- new quality of life method for interfacing with non-option based systems
+function Option:unpack()
+	if self:isSome() then
+		return self._value
+	end
+	return nil
 end
 
 function Option:unwrapOr(alt: unknown): unknown
@@ -155,6 +164,13 @@ return {
 			return asNone()
 		else
 			return asSome(out)
+		end
+	end,
+	from = function<V>(v: V?): Option<V>
+		if typeof(v) == "nil" then
+			return asNone()
+		else
+			return asSome(v)
 		end
 	end,
 }
