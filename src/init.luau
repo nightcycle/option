@@ -20,7 +20,7 @@ type OptionImpl<V> = {
 	unwrap: (self: Option<V>) -> V,
 	unwrapOr: (self: Option<V>, alt: V) -> V,
 	unwrapOrElse: (self: Option<V>, fn: () -> V) -> V,
-	unsafe: (self: Option<V>) -> V?,
+	asNullable: (self: Option<V>) -> V?,
 	expect: (self: Option<V>, msg: string) -> V,
 }
 
@@ -130,12 +130,12 @@ end
 do
 	local opt: any = Option
 	function opt:unpack()
-		return self:unsafe()
+		return self:asNullable()
 	end
 end
 
 -- new quality of life method for interfacing with non-option based systems
-function Option:unsafe()
+function Option:asNullable()
 	if self:isSome() then
 		return self._value
 	end
