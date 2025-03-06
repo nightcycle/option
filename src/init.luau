@@ -20,7 +20,7 @@ type OptionImpl<V> = {
 	unwrap: (self: Option<V>) -> V,
 	unwrapOr: (self: Option<V>, alt: V) -> V,
 	unwrapOrElse: (self: Option<V>, fn: () -> V) -> V,
-	unpack: (self: Option<V>) -> V?,
+	unsafe: (self: Option<V>) -> V?,
 	expect: (self: Option<V>, msg: string) -> V,
 }
 
@@ -126,8 +126,16 @@ function Option:unwrap()
 	error("Option is none")
 end
 
+-- deprecated, don't use
+do
+	local opt: any = Option
+	function opt:unpack()
+		return self:unsafe()
+	end
+end
+
 -- new quality of life method for interfacing with non-option based systems
-function Option:unpack()
+function Option:unsafe()
 	if self:isSome() then
 		return self._value
 	end
