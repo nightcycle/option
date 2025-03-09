@@ -166,6 +166,12 @@ end
 return {
 	none = asNone,
 	some = asSome,
+	isOption = function(value: unknown?): boolean
+		if typeof(value) == "table" then
+			return getmetatable(value :: any) == Option
+		end
+		return false
+	end,
 	try = function<V>(fn: () -> V?): Option<V>
 		local out = fn()
 		if typeof(out) == "nil" then
