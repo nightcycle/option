@@ -52,6 +52,7 @@ local asNone = function<V>(): Option<V>
 	return self
 end
 local asSome = function<V>(some: V): Option<V>
+	assert(typeof(some) ~= "nil", "some() value cannot be nil")
 	local self: Option<V> = setmetatable({
 		_state = STATE_SOME :: string,
 		_value = some,
