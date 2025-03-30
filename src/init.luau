@@ -7,21 +7,21 @@
 type State = "S" | "N"
 type OptionImpl<V> = {
 	__index: OptionImpl<V>,
-	__tostring: (self: Option<V>) -> string,
-	__eq: (self: Option<V>, other: Option<V>) -> boolean,
-	isSome: (self: Option<V>) -> boolean,
-	isNone: (self: Option<V>) -> boolean,
-	inspect: (self: Option<V>, fn: (value: V) -> ()) -> (),
-	match: <O>(self: Option<V>, some: (some: V) -> O, none: () -> O) -> O,
+	__tostring: (self: any) -> string,
+	__eq: (self: any, other: Option<V>) -> boolean,
+	isSome: (self: any) -> boolean,
+	isNone: (self: any) -> boolean,
+	inspect: (self: any, fn: (value: V) -> ()) -> (),
+	match: <O>(self: any, some: (some: V) -> O, none: () -> O) -> O,
 	--type swapping with map stuff is technically okay, but I can't get the type engine to recognize that
-	map: (self: Option<V>, fn: (some: V) -> V) -> Option<V>,
-	mapOr: (self: Option<V>, mapFn: (some: V) -> V, alt: V) -> Option<V>,
-	mapOrElse: (self: Option<V>, mapFn: (some: V) -> V, elseFn: () -> V) -> Option<V>,
-	unwrap: (self: Option<V>) -> V,
-	unwrapOr: (self: Option<V>, alt: V) -> V,
-	unwrapOrElse: (self: Option<V>, fn: () -> V) -> V,
-	asNullable: (self: Option<V>) -> V?,
-	expect: (self: Option<V>, msg: string) -> V,
+	map: (self: any, fn: (some: V) -> V) -> Option<V>,
+	mapOr: (self: any, mapFn: (some: V) -> V, alt: V) -> Option<V>,
+	mapOrElse: (self: any, mapFn: (some: V) -> V, elseFn: () -> V) -> Option<V>,
+	unwrap: (self: any) -> V,
+	unwrapOr: (self: any, alt: V) -> V,
+	unwrapOrElse: (self: any, fn: () -> V) -> V,
+	asNullable: (self: any) -> V?,
+	expect: (self: any, msg: string) -> V,
 }
 
 export type Option<V> = typeof(setmetatable(
@@ -44,7 +44,7 @@ Option.__index = Option
 
 -- Constructors
 local asNone = function<V>(): Option<V>
-	local self: Option<V> = setmetatable({
+	local self: any = setmetatable({
 		_state = STATE_NONE :: string,
 		_value = nil,
 	}, Option :: OptionImpl<any>)
@@ -53,7 +53,7 @@ local asNone = function<V>(): Option<V>
 end
 local asSome = function<V>(some: V): Option<V>
 	assert(typeof(some) ~= "nil", "some() value cannot be nil")
-	local self: Option<V> = setmetatable({
+	local self: any = setmetatable({
 		_state = STATE_SOME :: string,
 		_value = some,
 	}, Option :: OptionImpl<any>)
