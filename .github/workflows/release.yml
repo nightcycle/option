@@ -122,6 +122,9 @@ jobs:
             cache: npm
             cache-dependency-path: package-lock.json
 
+      - name: install node packages
+        run: sh scripts/npm-install.sh
+
       - name: build validate project
         run: sh scripts/validate.sh
 
