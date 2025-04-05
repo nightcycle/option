@@ -13,10 +13,10 @@ type OptionImpl<V> = {
 	isNone: (self: any) -> boolean,
 	inspect: (self: any, fn: (value: V) -> ()) -> (),
 	match: <O>(self: any, some: (some: V) -> O, none: () -> O) -> O,
-	--type swapping with map stuff is technically okay, but I can't get the type engine to recognize that
-	map: (self: any, fn: (some: V) -> V) -> Option<V>,
-	mapOr: (self: any, mapFn: (some: V) -> V, alt: V) -> Option<V>,
-	mapOrElse: (self: any, mapFn: (some: V) -> V, elseFn: () -> V) -> Option<V>,
+	-- removed because they make the type too complex but aren't used much
+	-- map: (self: any, fn: (some: V) -> V) -> Option<V>,--type swapping with map stuff is technically okay, but I can't get the type engine to recognize that
+	-- mapOr: (self: any, mapFn: (some: V) -> V, alt: V) -> Option<V>,
+	-- mapOrElse: (self: any, mapFn: (some: V) -> V, elseFn: () -> V) -> Option<V>,
 	unwrap: (self: any) -> V,
 	unwrapOr: (self: any, alt: V) -> V,
 	unwrapOrElse: (self: any, fn: () -> V) -> V,
@@ -99,21 +99,23 @@ function Option:match<O>(some: (some: unknown) -> O, none: () -> O): O
 	end
 end
 
-function Option:map(fn: (some: unknown) -> unknown): Option<unknown>
+local DeprecatedOption = Option :: any
+
+function DeprecatedOption:map(fn: (some: unknown) -> unknown): Option<unknown>
 	if self:isSome() then
 		return asSome(fn(self._value))
 	end
 	return asNone()
 end
 
-function Option:mapOr(mapFn: (some: unknown) -> unknown, alt: unknown): Option<unknown>
+function DeprecatedOption:mapOr(mapFn: (some: unknown) -> unknown, alt: unknown): Option<unknown>
 	if self:isSome() then
 		return asSome(mapFn(self._value))
 	end
 	return asSome(alt)
 end
 
-function Option:mapOrElse(mapFn: (some: unknown) -> unknown, elseFn: () -> unknown): Option<unknown>
+function DeprecatedOption:mapOrElse(mapFn: (some: unknown) -> unknown, elseFn: () -> unknown): Option<unknown>
 	if self:isSome() then
 		return asSome(mapFn(self._value))
 	end
