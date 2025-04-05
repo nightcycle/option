@@ -55,6 +55,9 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: install wally packages
+        run: sh scripts/wally-install.sh "dev.project.json"
+
       - name: build validate project
         run: sh scripts/validate.sh --wally
 
