@@ -24,13 +24,18 @@ type OptionImpl<V> = {
 	expect: (self: any, msg: string) -> V,
 }
 
-export type Option<V> = typeof(setmetatable(
-	{} :: {
-		_state: string, --"N" | "S", --replaced for performance reasons
-		_value: V?,
-	},
-	{} :: OptionImpl<V>
-))
+type OptionStruct<V> = {
+	_state: string, --"N" | "S", --replaced for performance reasons
+	_value: V?,
+}
+export type Option<V> = OptionImpl<V>
+-- typeof(setmetatable(
+-- 	{} :: {
+-- 		_state: string, --"N" | "S", --replaced for performance reasons
+-- 		_value: V?,
+-- 	},
+-- 	{} :: OptionImpl<V>
+-- ))
 
 -- Constants
 local STATE_SOME: "S" = "S"
@@ -70,7 +75,8 @@ end
 
 function Option:__eq(other: Option<unknown>): boolean
 	if self:isSome() and other:isSome() then
-		return self._value == other._value
+		local ot: any = other
+		return self._value == ot._value
 	end
 	return self:isNone() and other:isNone()
 end
