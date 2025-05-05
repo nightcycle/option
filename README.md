@@ -63,7 +63,7 @@ name:inspect(function(str)
 end)
 ```
 
-For extracting the state of the option
+For extracting the state of the option:
 
 ```luau
 
