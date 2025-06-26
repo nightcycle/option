@@ -11,9 +11,9 @@ type OptionStruct<V> = {
 }
 type Self = any
 type OptionImpl<V> = {
-	__index: OptionImpl<V>,
-	__tostring: (self: Self) -> string,
-	__eq: (self: Self, other: Option<V>) -> boolean,
+	-- __index: OptionImpl<V>,
+	-- __tostring: (self: Self) -> string,
+	-- __eq: (self: Self, other: Option<V>) -> boolean,
 	isSome: (self: Self) -> boolean,
 	isNone: (self: Self) -> boolean,
 	inspect: (self: Self, fn: (value: V) -> ()) -> (),
@@ -43,7 +43,6 @@ local STATE_NONE: "N" = "N"
 -- Private Functions
 -- Class
 local Option = {} :: OptionImpl<unknown>
-Option.__index = Option
 
 -- Constructors
 local asNone = function(): Option<any> --ideally would be variadic, but this causes so many snags in reality
@@ -63,23 +62,6 @@ local asSome = function<V>(some: V): Option<V>
 	}, Option :: OptionImpl<any>)
 	table.freeze(self)
 	return self
-end
-
--- used for debug readability
-function Option:__tostring()
-	if self:isSome() then
-		return "Some<" .. tostring(self._value) .. ">"
-	end
-	return "None"
-end
-
--- allows for equality checking between options
-function Option:__eq(other: Option<unknown>): boolean
-	if self:isSome() and other:isSome() then
-		local ot: any = other
-		return self._value == ot._value
-	end
-	return self:isNone() and other:isNone()
 end
 
 -- returns true if the option is some, false if it is none
@@ -160,6 +142,24 @@ end
 
 -- these work fine, but add a lot of complexity to the type system and aren't used much
 local DeprecatedOption = Option :: any
+DeprecatedOption.__index = Option
+
+-- used for debug readability
+function DeprecatedOption:__tostring()
+	if self:isSome() then
+		return "Some<" .. tostring(self._value) .. ">"
+	end
+	return "None"
+end
+
+-- allows for equality checking between options
+function DeprecatedOption:__eq(other: Option<unknown>): boolean
+	if self:isSome() and other:isSome() then
+		local ot: any = other
+		return self._value == ot._value
+	end
+	return self:isNone() and other:isNone()
+end
 
 function DeprecatedOption:mapOr(mapFn: (some: unknown) -> unknown, alt: unknown): Option<unknown>
 	if self:isSome() then
