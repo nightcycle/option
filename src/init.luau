@@ -17,7 +17,7 @@ type OptionImpl<V> = {
 	isSome: (self: Self) -> boolean,
 	isNone: (self: Self) -> boolean,
 	inspect: (self: Self, fn: (value: V) -> ()) -> (),
-	match: <O>(self: Self, some: (some: V) -> O, none: () -> O) -> O,
+	match: (self: Self, some: (some: V) -> V, none: () -> V) -> V,
 	map: (self: Self, fn: (some: V) -> V) -> Option<V>, --type swapping with map stuff is technically okay, but I can't get the type engine to recognize that
 	unwrap: (self: Self) -> V,
 	unwrapOr: (self: Self, alt: V) -> V,
@@ -83,7 +83,7 @@ function Option:inspect(fn: (value: unknown) -> ())
 end
 
 -- allows for the safe handling of each state
-function Option:match<O>(some: (some: unknown) -> O, none: () -> O): O
+function Option:match<O>(some: (some: unknown) -> unknown, none: () -> O): unknown
 	if self:isSome() then
 		return some(self._value)
 	else
@@ -183,12 +183,19 @@ end
 return {
 	none = asNone,
 	some = asSome,
+	match = function<VI, VO>(self: Option<VI>, some: (some: VI) -> VO, none: () -> VO): VO
+		if self:isSome() then
+			return some(self:unwrap())
+		else
+			return none()
+		end
+	end,
 	map = function<VI, VO>(self: Option<VI>, fn: (some: VI) -> VO): Option<VO> -- allows support for type swapping
-		return self:match(function(some: VI): Option<VO>
-			return asSome(fn(some))
-		end, function(): Option<VO>
+		if self:isSome() then
+			return asSome(fn(self:unwrap()))
+		else
 			return asNone()
-		end)
+		end
 	end,
 	isOption = function(value: unknown?): boolean
 		if typeof(value) == "table" then
